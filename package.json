@@ -1,0 +1,18 @@
+{
+  "name": "hawkeye",
+  "module": "main.ts",
+  "type": "module",
+  "private": true,
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "tsl-umd-v5": "^1.0.6"
+  },
+  "scripts": {
+    "build": "bun build ./main.ts --compile --outfile dist/hawkeye"
+  }
+}
