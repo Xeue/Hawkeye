@@ -2,20 +2,38 @@ import TSL5 from 'tsl-umd-v5';
 
 const cerebrumIP = '10.40.41.10';
 const cerebrumPort = 9000;
-const numberOfCourts = 18;
 const callWarningTime = 3;
 
 const cerebrum = new TSL5()
 cerebrum.listenTCP(9000)
+const courtsMap = new Map<number, number>([
+    [9000, 0],
+    [9001, 1],
+    [9002, 2],
+    [9003, 3],
+    [9004, 4],
+    [9005, 5],
+    [9006, 6],
+    [9007, 7],
+    [9008, 8],
+    [9009, 9],
+    [9010, 10],
+    [9011, 11],
+    [9012, 12],
+    [9014, 13],
+    [9015, 14],
+    [9016, 15],
+    [9017, 16],
+    [9018, 17],
+])
 
-
-for (let index = 0; index < numberOfCourts; index++) {
+for (let [port, index] of courtsMap) {
     Bun.listen({
         hostname: '0.0.0.0',
-        port: 9001+index,
+        port: port,
         socket: {
             async data(socket, data) {
-                console.log(`HawkEye trigger, port: ${9001+index}`);
+                console.log(`HawkEye trigger, port: ${port}`);
                 const dat = JSON.parse(data.toString());
                 const tally = {
                     "screen": 0,
@@ -51,6 +69,7 @@ for (let index = 0; index < numberOfCourts; index++) {
         }
     })
 }
+
 
 async function sleep(seconds: number) {
     return new Promise(resolve => {
