@@ -1,11 +1,13 @@
 import TSL5 from 'tsl-umd-v5';
+import { $ } from "bun";
 
 const cerebrumIP = '10.40.41.10';
 const cerebrumPort = 9000;
 const callWarningTime = 3;
+const OBSCourt = 1;
 
 const cerebrum = new TSL5()
-cerebrum.listenTCP(9000)
+
 const courtsMap = new Map<number, number>([
     [9000, 0],
     [9001, 1],
@@ -27,6 +29,8 @@ const courtsMap = new Map<number, number>([
     [9018, 17],
 ])
 
+SetGPIO(37, 0);
+
 for (let [port, index] of courtsMap) {
     Bun.listen({
         hostname: '0.0.0.0',
@@ -47,10 +51,12 @@ for (let [port, index] of courtsMap) {
                     }
                 }
                 cerebrum.sendTallyUDP(cerebrumIP, cerebrumPort, tally);
+                if (OBSCourt == index) SetGPIO(36, 1);
                 await sleep(callWarningTime);
                 tally.display.lh_tally = 0;
                 tally.display.text = "Close Call";
                 cerebrum.sendTallyUDP(cerebrumIP, cerebrumPort, tally);
+                if (OBSCourt == index) SetGPIO(36, 0);
                 socket.write('Got Data');
             },
             open(socket) {
@@ -75,4 +81,8 @@ async function sleep(seconds: number) {
     return new Promise(resolve => {
         setTimeout(()=>{resolve(true)}, seconds*1000)
     })
+}
+
+async function SetGPIO(pin: number, state: number) {
+    await $`sudo gpioset gpiochip1 ${pin}=${state}`;
 }
