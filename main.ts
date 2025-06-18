@@ -3,7 +3,7 @@ import { $ } from "bun";
 
 const cerebrumIP = '10.40.41.10';
 const cerebrumPort = 9000;
-const callWarningTime = 3;
+const callWarningTime = 2.5;
 const OBSCourt = 1;
 
 const cerebrum = new TSL5()
@@ -29,7 +29,8 @@ const courtsMap = new Map<number, number>([
     [9018, 17],
 ])
 
-SetGPIO(37, 0);
+SetGPIO(36, 1);
+SetGPIO(37, 1);
 
 for (let [port, index] of courtsMap) {
     Bun.listen({
@@ -51,12 +52,18 @@ for (let [port, index] of courtsMap) {
                     }
                 }
                 cerebrum.sendTallyUDP(cerebrumIP, cerebrumPort, tally);
-                if (OBSCourt == index) SetGPIO(36, 1);
+                if (dat.Decision == 'IN') {
+                    if (OBSCourt == index) SetGPIO(36, 0);
+                } else {
+                    if (OBSCourt == index) SetGPIO(37, 0);
+                }
                 await sleep(callWarningTime);
                 tally.display.lh_tally = 0;
                 tally.display.text = "Close Call";
                 cerebrum.sendTallyUDP(cerebrumIP, cerebrumPort, tally);
-                if (OBSCourt == index) SetGPIO(36, 0);
+                if (OBSCourt == index) SetGPIO(36, 1);
+                if (OBSCourt == index) SetGPIO(37, 1);
+callWarningTimecallWarningTime
                 socket.write('Got Data');
             },
             open(socket) {
